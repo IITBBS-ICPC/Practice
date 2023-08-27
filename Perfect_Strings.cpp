@@ -26,7 +26,7 @@ int inv[N];
 bool init = [](){
     inv[0] = 1;
     for(int i = 1; i < N; i++){
-        inv[i] = 1LL*pow2(1LL*i, mod-2)*inv[i-1]%mod;
+        inv[i] = 1LL*pow2(1LL*i, mod-2);
     }
     return true;
 }();
