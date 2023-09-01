@@ -50,7 +50,15 @@ int32_t main()
 {
     int q = 1;
     cin >> q;
-    vector<array<int, 5>> state_stack;
+
+    struct state
+    {
+        int u;
+        pair<int, int> valLastCountedOn, htLastVisBy;
+    };
+
+    vector<state> state_stack;
+
     vector<int> htLastVisBy(q + 1), valLastCountedOn(1e6 + 1), height(q + 1), countnode(q + 1), node(1), ans(q + 1);
     int v = 0;
     function<void(int)> addnode = [&](int x) {
@@ -67,7 +75,7 @@ int32_t main()
             )
             countnode[v] = 1;
 
-        state_stack.push_back({ u,x,valLastCountedOn[x],height[v],htLastVisBy[height[v]] });
+        state_stack.push_back({ u,{x,valLastCountedOn[x]},{height[v],htLastVisBy[height[v]]} });
         if (countnode[v]) {
             ans[v]++;
             valLastCountedOn[x] = v;
@@ -79,19 +87,19 @@ int32_t main()
     function<void(int)> jumpAncestor = [&](int k) {
         int u = v;
         v = htLastVisBy[height[v] - k];
-        state_stack.push_back({ u,-1 });
+        state_stack.push_back({ u,{-1,-1} });
         };
 
     function<void()> rollBack = [&]() {
-        auto [u, x, Vx, ht, Vht] = state_stack.back();
+        state prev = state_stack.back();
         state_stack.pop_back();
-        if (x < 0) {
-            v = u;
+        if (prev.valLastCountedOn.first < 0) {
+            v = prev.u;
             return;
         }
-        v = u;
-        valLastCountedOn[x] = Vx;
-        htLastVisBy[ht] = Vht;
+        v = prev.u;
+        valLastCountedOn[prev.valLastCountedOn.first] = prev.valLastCountedOn.second;
+        htLastVisBy[prev.htLastVisBy.first] = prev.htLastVisBy.second;
         };
     for (int qi = 0;qi < q;qi++) {
         char querytype;
@@ -115,6 +123,5 @@ int32_t main()
             cout << ans[v] << endl;
             break;
         }
-        // debug(v, height, valLastCountedOn, htLastVisBy);
     }
 }
